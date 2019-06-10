@@ -24,4 +24,5 @@ Tested on Node v10
 
 * https://codewithhugo.com/bring-redux-to-your-queue-logic-an-express-setup-with-es6-and-bull-queue/
 * https://github.com/larkintuckerllc/hello-nodejs-typescript
-* 
+* https://github.com/weijing329/bull-arena-typescript-dockerize
+
