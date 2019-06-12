@@ -1,37 +1,39 @@
 
 version: '2'
 services:
-    app:
-        build: .
-        container_name: my-app
-        environment:
-            - NODE_ENV=development
-            - PORT=3000
-            - REDIS_URL=redis://my-cache
-        command: "sh -c 'npm i && npm run dev'"
-        volumes:
-            - .:/var/www/app
-        links:
-            - redis
-        ports:
-            - "3000:3000"
+   # app:
+   #     build: .
+   #     container_name: my-app
+   #     environment:
+   #         - NODE_ENV=development
+   #         - PORT=3000
+   #         - REDIS_URL=redis://my_cache
+   #     command: "sh -c 'npm i && npm run dev'"
+   #     volumes:
+   #         - .:/var/www/app
+   #     links:
+   #         - redis
+   #     ports:
+   #         - "3000:3000"
 
-    worker:
-        build: .
-        container_name: my-worker
-        environment:
-            - NODE_ENV=development
-            - PORT=3000
-            - REDIS_URL=redis://my-cache
-        command: "sh -c 'npm i && npm run worker:dev'"
-        volumes:
-            - .:/var/www/app
-        links:
-            - redis
+   # worker:
+   #     build: .
+   #     container_name: my-worker
+   #     environment:
+   #         - NODE_ENV=development
+   #         - PORT=3000
+   #         - REDIS_URL=redis://my_cache
+   #     command: "sh -c 'npm i && npm run worker:dev'"
+   #     volumes:
+   #         - .:/var/www/app
+   #     links:
+   #         - redis
 
     redis:
         image: redis
-        container_name: my-cache
+        container_name: my_cache
+        ports:
+            - "6379:6379"
         expose:
             - "6379"
 

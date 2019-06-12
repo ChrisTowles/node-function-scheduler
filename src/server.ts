@@ -6,69 +6,40 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-import Arena from 'bull-arena';
+// import Arena from 'bull-arena';
+
+const Arena = require('bull-arena');
 import url from 'url';
 import { db } from './db';
-import { queues, NOTIFY_URL } from './queues';
+import { queues } from './queues';
+import { PORT, REDIS_URL} from './config';
+
 
 const app = express();
 
 app.use(bodyParser.json());
 
 
-app.get('/', (req, res) => res.send('Hello World! typescript is working.'));
+app.get('/', (req, res) => res.send(`
+<h1>Starfish - Node Function Scheduler</h1>
 
 
+<br /> 
+<h2>
+    Go to <a href="/arena">arena-page</a>
+</h2>
+<br/>
+<br/>
+<h4> This is a Spike on how we might replace talend for function scheduling. 
 
-/*
-app.post('/webhooks', async (req, res, next) => {
-  const { payload, urls } = req.body;
-  try {
-    const id = await db.setWebhook(payload, urls);
-    return res.json({
-      id
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+`));
 
-app.post('/webhooks/notify', async (req, res, next) => {
-  const { id } = req.body;
-  try {
-    const { payload, urls } = await db.getWebhook(id);
-    urls.forEach(url => {
-      queues[NOTIFY_URL].add({
-        payload,
-        url,
-        id
-      });
-    });
-    return res.sendStatus(200);
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.get('/webhooks/:id', async (req, res, next) => {
-  const { id } = req.params;
-  try {
-    const { payload, urls } = await db.getWebhook(id);
-    return res.json({
-      payload,
-      urls
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-*/
 app.post('/example', (req, res) => {
   console.log(`Hit example with ${JSON.stringify(req.body)}`);
   return res.sendStatus(200);
 });
 
-function getRedisConfig(redisUrl) {
+function getRedisConfig(redisUrl:string) {
   const redisConfig = url.parse(redisUrl);
   return {
     host: redisConfig.hostname || 'localhost',
@@ -77,24 +48,28 @@ function getRedisConfig(redisUrl) {
     password: redisConfig.auth ? redisConfig.auth.split(':')[1] : undefined
   };
 }
-/*
-app.use('/', Arena(
-  {
-    queues: [
-      {
-        name: NOTIFY_URL,
+
+// add all the queues we added to arena
+const arenaConfigQueues: any = [];
+queues.forEach( queue => {
+    arenaConfigQueues.push({
+        name: queue.name,
         hostId: 'Worker',
-        redis: getRedisConfig(process.env.REDIS_URL)
-      }
-    ]
-  },
-  {
-    basePath: '/arena',
-    disableListen: true
-  }
-));
-*/
-const PORT = process.env.PORT || 3000;
+        redis: getRedisConfig(REDIS_URL)
+    });
+})
+
+const arenaConfig = Arena(
+    {
+      queues: arenaConfigQueues
+    },
+    {
+      basePath: '/arena',
+      disableListen: true
+    }
+  );
+
+app.use('/', arenaConfig);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`)
