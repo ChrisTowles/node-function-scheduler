@@ -24,7 +24,7 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "axios": "^0.18.1",
     "body-parser": "^1.19.0",
     "bull": "^3.5.2",
